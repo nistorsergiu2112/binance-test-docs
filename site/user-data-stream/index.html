@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://helix-text.github.io/user-data-stream/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>User data stream - helix-new</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "User data stream";
+        var mkdocs_page_input_path = "user-data-stream.md";
+        var mkdocs_page_url = "/user-data-stream/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> helix-new
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../errors/">Errors</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../rest-api/">Rest Api</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../web-socket-api/">Websocket Api</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">helix-new</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>User data stream</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<p><strong>Table of Contents</strong>  <em>generated with <a href="https://github.com/thlorenz/doctoc">DocToc</a></em></p>
+<ul>
+<li><a href="#general-wss-information">General WSS information</a></li>
+<li><a href="#api-endpoints">API Endpoints</a></li>
+<li><a href="#create-a-listenkey-user_stream">Create a listenKey (USER_STREAM)</a></li>
+<li><a href="#pingkeep-alive-a-listenkey-user_stream">Ping/Keep-alive a listenKey (USER_STREAM)</a></li>
+<li><a href="#close-a-listenkey-user_stream">Close a listenKey (USER_STREAM)</a></li>
+<li><a href="#web-socket-payloads">Web Socket Payloads</a></li>
+<li><a href="#account-update">Account Update</a></li>
+<li><a href="#balance-update">Balance Update</a></li>
+<li><a href="#order-update">Order Update</a><ul>
+<li><a href="#execution-types">Execution types</a></li>
+</ul>
+</li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+<h1 id="user-data-streams-for-binance-2023-01-18">User Data Streams for Binance (2023-01-18)</h1>
+<h1 id="general-wss-information">General WSS information</h1>
+<ul>
+<li>The base API endpoint is: <strong>https://api.binance.com</strong></li>
+<li>A User Data Stream <code>listenKey</code> is valid for 60 minutes after creation.</li>
+<li>Doing a <code>PUT</code> on an active <code>listenKey</code> will extend its validity for 60 minutes.</li>
+<li>Doing a <code>DELETE</code> on an active <code>listenKey</code> will close the stream and invalidate the <code>listenKey</code>.</li>
+<li>Doing a <code>POST</code> on an account with an active <code>listenKey</code> will return the currently active <code>listenKey</code> and extend its validity for 60 minutes.</li>
+<li>The base websocket endpoint is: <strong>wss://stream.binance.com:9443</strong></li>
+<li>User Data Streams are accessed at <strong>/ws/\&lt;listenKey></strong> or <strong>/stream?streams=\&lt;listenKey></strong></li>
+<li>A single connection to <strong>stream.binance.com</strong> is only valid for 24 hours; expect to be disconnected at the 24 hour mark</li>
+</ul>
+<h1 id="api-endpoints">API Endpoints</h1>
+<h2 id="create-a-listenkey-user_stream">Create a listenKey (USER_STREAM)</h2>
+<pre><code>POST /api/v3/userDataStream
+</code></pre>
+<p>Start a new user data stream. The stream will close after 60 minutes unless a keepalive is sent. If the account has an active <code>listenKey</code>, that <code>listenKey</code> will be returned and its validity will be extended for 60 minutes.</p>
+<p><strong>Weight:</strong>
+1</p>
+<p><strong>Parameters:</strong>
+NONE</p>
+<p><strong>Response:</strong></p>
+<pre><code class="language-javascript">{
+  &quot;listenKey&quot;: &quot;pqia91ma19a5s61cv6a81va65sdf19v8a65a1a5s61cv6a81va65sdf19v8a65a1&quot;
+}
+</code></pre>
+<h2 id="pingkeep-alive-a-listenkey-user_stream">Ping/Keep-alive a listenKey (USER_STREAM)</h2>
+<pre><code>PUT /api/v3/userDataStream
+</code></pre>
+<p>Keepalive a user data stream to prevent a time out. User data streams will close after 60 minutes. It's recommended to send a ping about every 30 minutes.</p>
+<p><strong>Weight:</strong>
+1</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>listenKey</td>
+<td>STRING</td>
+<td>YES</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response:</strong></p>
+<pre><code class="language-javascript">{}
+</code></pre>
+<h2 id="close-a-listenkey-user_stream">Close a listenKey (USER_STREAM)</h2>
+<pre><code>DELETE /api/v3/userDataStream
+</code></pre>
+<p>Close out a user data stream.</p>
+<p><strong>Weight:</strong>
+1</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Mandatory</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>listenKey</td>
+<td>STRING</td>
+<td>YES</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response:</strong></p>
+<pre><code class="language-javascript">{}
+</code></pre>
+<h1 id="web-socket-payloads">Web Socket Payloads</h1>
+<h2 id="account-update">Account Update</h2>
+<p><code>outboundAccountPosition</code> is sent any time an account balance has changed and contains the assets that were possibly changed by the event that generated the balance change.</p>
+<pre><code class="language-javascript">{
+  &quot;e&quot;: &quot;outboundAccountPosition&quot;, //Event type
+  &quot;E&quot;: 1564034571105,             //Event Time
+  &quot;u&quot;: 1564034571073,             //Time of last account update
+  &quot;B&quot;: [                          //Balances Array
+    {
+      &quot;a&quot;: &quot;ETH&quot;,                 //Asset
+      &quot;f&quot;: &quot;10000.000000&quot;,        //Free
+      &quot;l&quot;: &quot;0.000000&quot;             //Locked
+    }
+  ]
+}
+</code></pre>
+<h2 id="balance-update">Balance Update</h2>
+<p>Balance Update occurs during the following:
+* Deposits or withdrawals from the account
+* Transfer of funds between accounts (e.g. Spot to Margin)</p>
+<p><strong>Payload</strong></p>
+<pre><code class="language-javascript">{
+  &quot;e&quot;: &quot;balanceUpdate&quot;,         //Event Type
+  &quot;E&quot;: 1573200697110,           //Event Time
+  &quot;a&quot;: &quot;BTC&quot;,                   //Asset
+  &quot;d&quot;: &quot;100.00000000&quot;,          //Balance Delta
+  &quot;T&quot;: 1573200697068            //Clear Time
+}
+</code></pre>
+<h2 id="order-update">Order Update</h2>
+<p>Orders are updated with the <code>executionReport</code> event.</p>
+<p><strong>Payload:</strong></p>
+<pre><code class="language-javascript">{
+  &quot;e&quot;: &quot;executionReport&quot;,        // Event type
+  &quot;E&quot;: 1499405658658,            // Event time
+  &quot;s&quot;: &quot;ETHBTC&quot;,                 // Symbol
+  &quot;c&quot;: &quot;mUvoqJxFIILMdfAW5iGSOW&quot;, // Client order ID
+  &quot;S&quot;: &quot;BUY&quot;,                    // Side
+  &quot;o&quot;: &quot;LIMIT&quot;,                  // Order type
+  &quot;f&quot;: &quot;GTC&quot;,                    // Time in force
+  &quot;q&quot;: &quot;1.00000000&quot;,             // Order quantity
+  &quot;p&quot;: &quot;0.10264410&quot;,             // Order price
+  &quot;P&quot;: &quot;0.00000000&quot;,             // Stop price
+  &quot;d&quot;: 4,                        // Trailing Delta; This is only visible if the order was a trailing stop order.
+  &quot;F&quot;: &quot;0.00000000&quot;,             // Iceberg quantity
+  &quot;g&quot;: -1,                       // OrderListId
+  &quot;C&quot;: &quot;&quot;,                       // Original client order ID; This is the ID of the order being canceled
+  &quot;x&quot;: &quot;NEW&quot;,                    // Current execution type
+  &quot;X&quot;: &quot;NEW&quot;,                    // Current order status
+  &quot;r&quot;: &quot;NONE&quot;,                   // Order reject reason; will be an error code.
+  &quot;i&quot;: 4293153,                  // Order ID
+  &quot;l&quot;: &quot;0.00000000&quot;,             // Last executed quantity
+  &quot;z&quot;: &quot;0.00000000&quot;,             // Cumulative filled quantity
+  &quot;L&quot;: &quot;0.00000000&quot;,             // Last executed price
+  &quot;n&quot;: &quot;0&quot;,                      // Commission amount
+  &quot;N&quot;: null,                     // Commission asset
+  &quot;T&quot;: 1499405658657,            // Transaction time
+  &quot;t&quot;: -1,                       // Trade ID
+  &quot;v&quot;: 3,                        // Prevented Match Id; This is only visible if the order expire due to STP trigger
+  &quot;I&quot;: 8641984,                  // Ignore
+  &quot;w&quot;: true,                     // Is the order on the book?
+  &quot;m&quot;: false,                    // Is this trade the maker side?
+  &quot;M&quot;: false,                    // Ignore
+  &quot;O&quot;: 1499405658657,            // Order creation time
+  &quot;Z&quot;: &quot;0.00000000&quot;,             // Cumulative quote asset transacted quantity
+  &quot;Y&quot;: &quot;0.00000000&quot;,             // Last quote asset transacted quantity (i.e. lastPrice * lastQty)
+  &quot;Q&quot;: &quot;0.00000000&quot;,             // Quote Order Quantity
+  &quot;D&quot;: 1668680518494,            // Trailing Time; This is only visible if the trailing stop order has been activated.
+  &quot;j&quot;: 1,                        // Strategy ID; This is only visible if the strategyId parameter was provided upon order placement
+  &quot;J&quot;: 1000000,                  // Strategy Type; This is only visible if the strategyType parameter was provided upon order placement
+  &quot;W&quot;: 1499405658657,            // Working Time; This is only visible if the order has been placed on the book.
+  &quot;V&quot;: &quot;NONE&quot;                    // SelfTradePreventionMode
+  &quot;u&quot;:1,                         // TradeGroupId; This is only visible if the account is part of a trade group and the order expired due to STP trigger.
+  &quot;U&quot;:37,                        // CounterOrderId; This is only visible if the order expired due to STP trigger.
+  &quot;A&quot;:&quot;3.000000&quot;,                // Prevented Quantity; This is only visible if the order expired due to STP trigger.
+  &quot;B&quot;:&quot;3.000000&quot;                 // Last Prevented Quantity; This is only visible if the order expired due to STP trigger.
+}
+</code></pre>
+<p><strong>Note:</strong> Average price can be found by doing <code>Z</code> divided by <code>z</code>.</p>
+<p>If the order is an OCO, an event will be displayed named <code>ListStatus</code> in addition to the <code>executionReport</code> event.</p>
+<p><strong>Payload</strong></p>
+<pre><code class="language-javascript">{
+  &quot;e&quot;: &quot;listStatus&quot;,                //Event Type
+  &quot;E&quot;: 1564035303637,               //Event Time
+  &quot;s&quot;: &quot;ETHBTC&quot;,                    //Symbol
+  &quot;g&quot;: 2,                           //OrderListId
+  &quot;c&quot;: &quot;OCO&quot;,                       //Contingency Type
+  &quot;l&quot;: &quot;EXEC_STARTED&quot;,              //List Status Type
+  &quot;L&quot;: &quot;EXECUTING&quot;,                 //List Order Status
+  &quot;r&quot;: &quot;NONE&quot;,                      //List Reject Reason
+  &quot;C&quot;: &quot;F4QN4G8DlFATFlIUQ0cjdD&quot;,    //List Client Order ID
+  &quot;T&quot;: 1564035303625,               //Transaction Time
+  &quot;O&quot;: [                            //An array of objects
+    {
+      &quot;s&quot;: &quot;ETHBTC&quot;,                //Symbol
+      &quot;i&quot;: 17,                      // orderId
+      &quot;c&quot;: &quot;AJYsMjErWJesZvqlJCTUgL&quot; //ClientOrderId
+    },
+    {
+      &quot;s&quot;: &quot;ETHBTC&quot;,
+      &quot;i&quot;: 18,
+      &quot;c&quot;: &quot;bfYPSQdLoqAJeNrOr9adzq&quot;
+    }
+  ]
+}
+</code></pre>
+<h3 id="execution-types">Execution types</h3>
+<ul>
+<li><code>NEW</code> - The order has been accepted into the engine.</li>
+<li><code>CANCELED</code> - The order has been canceled by the user. </li>
+<li><code>REPLACED</code> (currently unused)</li>
+<li><code>REJECTED</code> - The order has been rejected and was not processed (This message appears only with Cancel Replace Orders wherein the new order placement is rejected but the request to cancel request succeeds.)</li>
+<li><code>TRADE</code> - Part of the order or all of the order's quantity has filled.</li>
+<li><code>EXPIRED</code> - The order was canceled according to the order type's rules (e.g. LIMIT FOK orders with no fill, LIMIT IOC or MARKET orders that partially fill) or by the exchange, (e.g. orders canceled during liquidation, orders canceled during maintenance).</li>
+<li><code>TRADE_PREVENTION</code> - The order has expired due to STP trigger.</li>
+</ul>
+<p>Check the <a href="../rest-api/#enum-definitions">Rest API Documentation</a> for more relevant enum definitions.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
