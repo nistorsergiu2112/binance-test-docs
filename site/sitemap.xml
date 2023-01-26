@@ -40,19 +40,4 @@
          <lastmod>2023-01-26</lastmod>
          <changefreq>daily</changefreq>
     </url>
-    <url>
-         <loc>https://helix-text.github.io/faqs/spot_glossary/</loc>
-         <lastmod>2023-01-26</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://helix-text.github.io/faqs/stp_faq/</loc>
-         <lastmod>2023-01-26</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://helix-text.github.io/faqs/trailing-stop-faq/</loc>
-         <lastmod>2023-01-26</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
 </urlset>
