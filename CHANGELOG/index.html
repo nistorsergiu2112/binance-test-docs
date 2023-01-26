@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://helix-text.github.io/CHANGELOG/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>CHANGELOG for Binance's API (2023-01-23) - helix-new</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "CHANGELOG for Binance\u0027s API (2023-01-23)";
+        var mkdocs_page_input_path = "CHANGELOG.md";
+        var mkdocs_page_url = "/CHANGELOG/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> helix-new
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../errors/">Errors</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../rest-api/">Rest Api</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../web-socket-api/">Websocket Api</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">helix-new</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>CHANGELOG for Binance's API (2023-01-23)</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="changelog-for-binances-api-2023-01-23">CHANGELOG for Binance's API (2023-01-23)</h1>
+<h2 id="2023-01-23">2023-01-23</h2>
+<p>New API cluster has been added. Note that all endpoints are functionally equal, but may vary in performance.</p>
+<ul>
+<li>https://api4.binance.com</li>
+</ul>
+<hr />
+<h2 id="release-date-tbd">RELEASE DATE TBD</h2>
+<p><strong>New Feature</strong>: Self-Trade Prevention (aka STP) will be added to the system at a later date. This will prevent orders from matching with orders from the same account, or accounts under the same <code>tradeGroupId</code>. </p>
+<p>Please refer to <code>GET /api/v3/exchangeInfo</code> from the Rest API or <code>exchangeInfo</code> from the Websocket API on the status. </p>
+<pre><code class="language-javascript">&quot;defaultSelfTradePreventionMode&quot;: &quot;NONE&quot;,   //If selfTradePreventionMode not provided, this will be the value passed to the engine
+&quot;allowedSelfTradePreventionModes&quot;: [        //What the allowed modes of selfTradePrevention are
+    &quot;NONE&quot;,
+    &quot;EXPIRE_TAKER&quot;,
+    &quot;EXPIRE_BOTH&quot;,
+    &quot;EXPIRE_MAKER&quot;
+]
+</code></pre>
+<p>Additional details on the functionality of STP is explained in the <a href="../faqs/stp_faq/">STP FAQ</a> document.</p>
+<p>REST API</p>
+<ul>
+<li>New order status: <code>EXPIRED_IN_MATCH</code> - This means that the order expired due to STP being triggered.</li>
+<li>New endpoint:</li>
+<li><code>GET /api/v3/myPreventedMatches</code> - This queries the orders that expired due to STP being triggered.</li>
+<li>New optional parameter <code>selfTradePreventionMode</code> has been added to the following endpoints:<ul>
+<li><code>POST /api/v3/order</code></li>
+<li><code>POST /api/v3/order/oco</code></li>
+<li><code>POST /api/v3/cancelReplace</code></li>
+</ul>
+</li>
+<li>New responses that will appear for all order placement endpoints if there was a prevented match (i.e. if an order could have matched with an order of the same account, or the accounts are in the same <code>tradeGroupId</code>): <ul>
+<li><code>tradeGroupId</code>      - This will only appear if account is configured to a <code>tradeGroupId</code> and if there was a prevented match.</li>
+<li><code>preventedQuantity</code> - Only appears if there was a prevented match</li>
+<li>An array <code>preventedMatches</code> with the following fields:<ul>
+<li><code>preventedMatchId</code></li>
+<li><code>makerOrderId</code></li>
+<li><code>price</code></li>
+<li><code>takerPreventedQuantity</code> - This will only appear if <code>selfTradePreventionMode</code> set is <code>EXPIRE_TAKER</code> or <code>EXPIRE_BOTH</code>.</li>
+<li><code>makerPreventedQuantity</code> - This will only appear if <code>selfTradePreventionMode</code> set is <code>EXPIRE_MAKER</code> or <code>EXPIRE_BOTH</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>New fields <code>preventedMatchId</code> and <code>preventedQuantity</code> that can appear in the order query endpoints if the order had expired due to an STP trigger: <ul>
+<li><code>GET /api/v3/order</code></li>
+<li><code>GET /api/v3/openOrders</code></li>
+<li><code>GET /api/v3/allOrders</code></li>
+</ul>
+</li>
+</ul>
+<p>WEBSOCKET API</p>
+<ul>
+<li>New order status: <code>EXPIRED_IN_MATCH</code> - This means that the order expired due to STP being triggered.</li>
+<li>New optional parameter <code>selfTradePreventionMode</code> has been added to the following requests:<ul>
+<li><code>order.place</code></li>
+<li><code>orderList.place</code></li>
+<li><code>order.cancelReplace</code></li>
+</ul>
+</li>
+<li>New request: <code>myPreventedMatches</code> - This queries the orders that expired due to STP being triggered.</li>
+<li>New responses that will appear for all order placement endpoints if there was a prevented match (i.e. if an order could have matched with an order of the same account, or the accounts are in the same <code>tradeGroupId</code>): <ul>
+<li><code>tradeGroupId</code>      - This will only appear if account is configured to a <code>tradeGroupId</code> and if there was a prevented match.</li>
+<li><code>preventedQuantity</code> - Only appears if there was a prevented match.</li>
+<li>An array <code>preventedMatches</code> with the following fields:<ul>
+<li><code>preventedMatchId</code></li>
+<li><code>makerOrderId</code></li>
+<li><code>price</code></li>
+<li><code>takerPreventedQuantity</code> - This will only appear if <code>selfTradePreventionMode</code> set is <code>EXPIRE_TAKER</code> or <code>EXPIRE_BOTH</code>.</li>
+<li><code>makerPreventedQuantity</code> - This will only appear if <code>selfTradePreventionMode</code> set is <code>EXPIRE_MAKER</code> or <code>EXPIRE_BOTH</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>New fields <code>preventedMatchId</code> and <code>preventedQuantity</code> that can appear in the order query requests if the order had expired due to STP trigger: <ul>
+<li><code>order.status</code></li>
+<li><code>openOrders.status</code></li>
+<li><code>allOrders</code></li>
+</ul>
+</li>
+</ul>
+<p>USER DATA STREAM</p>
+<ul>
+<li>New execution Type: <code>TRADE_PREVENTION</code></li>
+<li>New fields for <code>executionReport</code> (These fields will only appear if the order has expired due to STP trigger)<ul>
+<li><code>u</code> - <code>tradeGroupId</code> </li>
+<li><code>v</code> - <code>preventedMatchId</code></li>
+<li><code>U</code> - <code>counterOrderId</code></li>
+<li><code>A</code> - <code>preventedQuantity</code></li>
+<li><code>B</code> - <code>lastPreventedQuantity</code></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-12-28">2022-12-28</h2>
+<ul>
+<li>SPOT WebSocket API documentation has been updated to show how to sign a request using an RSA key.</li>
+</ul>
+<hr />
+<h2 id="2022-12-26">2022-12-26</h2>
+<ul>
+<li>Spot WebSocket API is now available on the live exchange.</li>
+<li>Spot Websocket API can be accessed through this URL: <code>wss://ws-api.binance.com/ws-api/v3</code></li>
+</ul>
+<hr />
+<h2 id="2022-12-15">2022-12-15</h2>
+<ul>
+<li>New RSA signature<ul>
+<li>Documentation has been updated to show how to create RSA keys.</li>
+<li>For security reasons, we recommend to use RSA keys instead of HMAC keys when generating an API key.</li>
+<li>We accept <code>PKCS#8</code> (BEGIN PUBLIC KEY).</li>
+<li>More details on how to upload your RSA public key will be added at a later date.</li>
+</ul>
+</li>
+<li>SPOT WebSocket API is now available on <strong>SPOT Testnet</strong>.<ul>
+<li>WebSocket API allows placing orders, canceling orders, etc. through a WebSocket connection.</li>
+<li>WebSocket API is a <strong>separate</strong> service from WebSocket Market Data streams. I.e., placing orders and listening to market data requires two separate WebSocket connections.</li>
+<li>WebSocket API is subject to the same Filter and Rate Limit rules as REST API.</li>
+<li>WebSocket API and REST API are functionally equivalent: they provide the same features, accept the same parameters, return the same status and error codes.</li>
+</ul>
+</li>
+</ul>
+<p><strong>WEBSOCKET API WILL BE AVAILABLE ON THE LIVE EXCHANGE AT A LATER DATE.</strong></p>
+<hr />
+<h2 id="2022-12-13">2022-12-13</h2>
+<p>REST API</p>
+<p>Some error messages on error code <code>-1003</code> have changed. 
+* Previous error message: <code>Too much request weight used; current limit is %s request weight per %s %s. Please use the websocket for live updates to avoid polling the API.</code> has been updated to:</p>
+<pre><code>Too much request weight used; current limit is %s request weight per %s. Please use WebSocket Streams for live updates to avoid polling the API.
+</code></pre>
+<ul>
+<li>Previous error message <code>Way too much request weight used; IP banned until %s. Please use the websocket for live updates to avoid bans.</code> has been updated to:</li>
+</ul>
+<pre><code>Way too much request weight used; IP banned until %s. Please use WebSocket Streams for live updates to avoid bans.
+</code></pre>
+<hr />
+<h2 id="2022-12-05">2022-12-05</h2>
+<p><strong>Notice:</strong> These changes are being rolled out gradually to all our servers, and will take approximately a week to complete.</p>
+<p>WEBSOCKET</p>
+<ul>
+<li><code>!bookTicker</code> will be removed by <strong>December 7, 2022</strong>. Please use the Individual Book Ticker Streams instead (<code>&lt;symbol&gt;@bookTicker</code>).<ul>
+<li>Multiple <code>&lt;symbol&gt;@bookTicker</code> streams can be subscribed to over one connection. (E.g. <code>wss://stream.binance.com:9443/stream?streams=btcusdt@bookTicker/bnbbtc@bookTicker</code>)</li>
+</ul>
+</li>
+</ul>
+<p>REST API</p>
+<ul>
+<li>New error code <code>-1135</code><ul>
+<li>This error code will occur if a parameter requiring a JSON object is invalid.</li>
+</ul>
+</li>
+<li>New error code <code>-1108</code><ul>
+<li>This error will occur if a value to a parameter being sent was too large, potentially causing overflow.</li>
+<li>This error code can occur in the following endpoints:<ul>
+<li><code>POST /api/v3/order</code></li>
+<li><code>POST /api/v3/order/cancelReplace</code></li>
+<li><code>POST /api/v3/order/oco</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Changes to <code>GET /api/v3/aggTrades</code><ul>
+<li>Previous behavior: <code>startTime</code> and <code>endTime</code> had to be used in combination and could only be an hour apart.</li>
+<li>New behavior: <code>startTime</code> and <code>endTime</code> can be used individually and the 1 hour limit has been removed.<ul>
+<li>When using <code>startTime</code> only, this will return trades from that time, up to the <code>limit</code> provided.</li>
+<li>When using <code>endTime</code> only, this will return trades before that time, up to the <code>limit</code> provided.</li>
+<li>If <code>limit</code> not provided, regardless of used in combination or sent individually, the endpoint will use the default limit.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Changes to <code>GET /api/v3/myTrades</code><ul>
+<li>Fixed a bug where <code>symbol</code> + <code>orderId</code> combination would return all trades even if the number of trades went beyond the <code>500</code> default limit.</li>
+<li>
+<p>Previous behavior: The API would send specific error messages depending on the combination of parameters sent. E.g:</p>
+<p><code>json
+    {
+        "code": -1106,
+        "msg": "Parameter X was sent when not required."
+    }</code>
+    * New behavior: If the combinations of optional parameters to the endpoint were not supported, then the endpoint will respond with the generic error:</p>
+<p><code>json
+    {
+        "code": -1128,
+        "msg": "Combination of optional parameters invalid."
+    }</code>
+    * Added a new combination of supported parameters: <code>symbol</code> + <code>orderId</code> + <code>fromId</code>.
+    * The following combinations of parameters were previously supported but no longer accepted, as these combinations were only taking <code>fromId</code> into consideration, ignoring <code>startTime</code> and <code>endTime</code>: 
+* <code>symbol</code> + <code>fromId</code> + <code>startTime</code>
+* <code>symbol</code> + <code>fromId</code> + <code>endTime</code>
+* <code>symbol</code> + <code>fromId</code> + <code>startTime</code> + <code>endTime</code>
+    * Thus, these are the supported combinations of parameters:
+* <code>symbol</code>
+* <code>symbol</code> + <code>orderId</code>
+* <code>symbol</code> + <code>startTime</code>
+* <code>symbol</code> + <code>endTime</code>
+* <code>symbol</code> + <code>fromId</code>
+* <code>symbol</code> + <code>startTime</code> + <code>endTime</code>
+* <code>symbol</code>+ <code>orderId</code> + <code>fromId</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Note:</strong> These new fields will appear approximately a week from the release date.</p>
+<ul>
+<li>Changes to <code>GET /api/v3/exchangeInfo</code><ul>
+<li>New fields <code>defaultSelfTradePreventionMode</code> and <code>allowedSelfTradePreventionModes</code></li>
+</ul>
+</li>
+<li>Changes to the Order Placement Endpoints/Order Query/Order Cancellation Endpoints:<ul>
+<li>New field <code>selfTradePreventionMode</code> will appear in the response.</li>
+<li>Affects the following endpoints:<ul>
+<li><code>POST /api/v3/order</code></li>
+<li><code>POST /api/v3/order/oco</code></li>
+<li><code>POST /api/v3/order/cancelReplace</code></li>
+<li><code>GET /api/v3/order</code></li>
+<li><code>DELETE /api/v3/order</code></li>
+<li><code>DELETE /api/v3/orderList</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Changes to  <code>GET /api/v3/account</code><ul>
+<li>New field <code>requireSelfTradePrevention</code> will appear in the response.</li>
+</ul>
+</li>
+<li>New field <code>workingTime</code>, indicating when the order started working on the order book, will appear in the following endpoints:<ul>
+<li><code>POST /api/v3/order</code></li>
+<li><code>GET /api/v3/order</code></li>
+<li><code>POST /api/v3/order/cancelReplace</code></li>
+<li><code>POST /api/v3/order/oco</code></li>
+<li><code>GET /api/v3/order</code></li>
+<li><code>GET /api/v3/openOrders</code></li>
+<li><code>GET /api/v3/allOrders</code></li>
+</ul>
+</li>
+<li>Field <code>trailingTime</code>, indicating the time when the trailing order is active and tracking price changes, will appear for the following order types  (<code>TAKE_PROFIT</code>, <code>TAKE_PROFIT_LIMIT</code>, <code>STOP_LOSS</code>, <code>STOP_LOSS_LIMIT</code> if <code>trailingDelta</code> parameter was provided) for the following endpoints: <ul>
+<li><code>POST /api/v3/order</code></li>
+<li><code>GET /api/v3/order</code></li>
+<li><code>GET /api/v3/openOrders</code></li>
+<li><code>GET /api/v3/allOrders</code></li>
+<li><code>POST /api/v3/order/cancelReplace</code></li>
+<li><code>DELETE /api/v3/order</code></li>
+</ul>
+</li>
+<li>Field <code>commissionRates</code> will appear in the <code>GET /api/v3/acccount</code> response</li>
+</ul>
+<p>USER DATA STREAM</p>
+<ul>
+<li>eventType <code>executionReport</code> has new fields<ul>
+<li><code>V</code> - <code>selfTradePreventionMode</code> </li>
+<li><code>D</code> - <code>trailing_time</code>  (Appears if the trailing stop order is active)</li>
+<li><code>W</code> - <code>workingTime</code>   (Appears if <code>isWorking</code>=<code>true</code>)</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-12-02">2022-12-02</h2>
+<ul>
+<li>Added a new market data base URL <code>https://data.binance.com</code>.</li>
+<li>Added a new WebSocket URL <code>wss://data-stream.binance.com</code>.</li>
+</ul>
+<hr />
+<h2 id="2022-09-30">2022-09-30</h2>
+<p>Scheduled changes to the removal of <code>!bookTicker</code> around November 2022.</p>
+<ul>
+<li>The All Book Tickers stream (<code>!bookTicker</code>) is set to be removed in <strong>November 2022</strong>.</li>
+<li>More details of the actual removal date will be announced at a later time.</li>
+<li>Please use the Individual Book Ticker Streams instead. (<code>&lt;symbol&gt;@bookTicker</code>).</li>
+<li>Multiple <code>&lt;symbol&gt;@bookTicker</code> streams can be subscribed to over one connection. <ul>
+<li>Example: wss://stream.binance.com:9443/stream?streams=btcusdt@bookTicker/bnbbtc@bookTicker</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-09-15">2022-09-15</h2>
+<p>Note that these are rolling changes, so it may take a few days for it to rollout to all our servers.</p>
+<ul>
+<li>Changes to <code>GET /api/v3/exchangeInfo</code><ul>
+<li>New optional parameter <code>permissions</code> added to display all symbols with the permissions matching the parameter provided. (eg.<code>SPOT</code>,<code>MARGIN</code>)</li>
+<li>If not provided, the default value will be <code>["SPOT","MARGIN","LEVERAGED"]</code>.<ul>
+<li>This means the request <code>GET /api/v3/exchangeInfo</code> without any parameters will show all symbols that can be used for <code>SPOT</code>, <code>MARGIN</code>, and/or <code>LEVERAGED</code> trading.</li>
+<li>To search for symbols that can be traded on other permissions (e.g. <code>TRD_GRP_004</code>, etc), then this needs to be searched for explicitly. (e.g.<code>permissions</code>=<code>TRD_GRP_004</code>)</li>
+</ul>
+</li>
+<li>Cannot be combined with <code>symbol</code> or <code>symbols</code></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-08-23">2022-08-23</h2>
+<p>Note that these are rolling changes, so it may take a few days for it to rollout to all our servers.</p>
+<ul>
+<li>Changes to <code>GET /api/v3/ticker</code> and <code>GET /api/v3/ticker/24hr</code><ul>
+<li>New optional parameter <code>type</code> added</li>
+<li>Supported values for parameter <code>type</code> are <code>FULL</code> and <code>MINI</code><ul>
+<li><code>FULL</code> is the default value and the response that is currently being returned from the endpoint</li>
+<li><code>MINI</code> omits the following fields from the response: <code>priceChangePercent</code>, <code>weightedAvgPrice</code>, <code>bidPrice</code>, <code>bidQty</code>, <code>askPrice</code>, <code>askQty</code>, and <code>lastQty</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>New error code <code>-1008</code> <ul>
+<li>This is sent whenever the servers are overloaded with requests.</li>
+</ul>
+</li>
+<li>New field <code>brokered</code> has been added to <code>GET /api/v3/account</code></li>
+<li>New kline interval: <code>1s</code></li>
+<li>New endpoint added: <code>GET /api/v3/uiKlines</code></li>
+</ul>
+<hr />
+<h2 id="2022-08-08">2022-08-08</h2>
+<p>REST API</p>
+<ul>
+<li>Changes to <code>POST /api/v3/order</code> and <code>POST /api/v3/order/cancelReplace</code> <ul>
+<li>New optional fields <code>strategyId</code> and <code>strategyType</code><ul>
+<li><code>strategyId</code> is a parameter used to identify an order as part of a strategy. </li>
+<li><code>strategyType</code> is a parameter used to identify what strategy was running. (E.g. If all the orders are part of spot grid strategy, it can be set to <code>strategyType=1000000</code>)<ul>
+<li>Note that the minimum value allowed for <code>strategyType</code> is <code>1000000</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Changes to <code>POST /api/v3/order/oco</code><ul>
+<li>New optional fields <code>limitStrategyId</code>, <code>limitStrategyType</code>, <code>stopStrategyId</code>, <code>stopStrategyType</code></li>
+<li>These are the strategy metadata parameters for both legs of the OCO orders.</li>
+<li><code>limitStrategyType</code> and <code>stopStrategyType</code> both cannot be less than <code>1000000</code>.</li>
+</ul>
+</li>
+<li>Changes to <code>GET /api/v3/order</code>, <code>GET /api/v3/openOrders</code>, and <code>GET /api/v3/allOrders</code><ul>
+<li>New fields <code>strategyId</code> and <code>strategyType</code> will appear in the response JSON for orders that had these fields populated upon order placement.</li>
+</ul>
+</li>
+<li>Changes to <code>DELETE /api/v3/order</code> and <code>DELETE /api/v3/openOrders</code><ul>
+<li>New fields <code>strategyId</code> and <code>strategyType</code> will appear in the response JSON for cancelled orders that had these fields populated upon order placement.</li>
+</ul>
+</li>
+</ul>
+<p>USER DATA STREAM</p>
+<ul>
+<li>New fields to eventType <code>executionReport</code><ul>
+<li><code>j</code> for <code>strategyId</code></li>
+<li><code>J</code> for <code>strategyType</code></li>
+<li>Note that these fields only appear if these were populated upon order placement.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-06-20">2022-06-20</h2>
+<p>Changes to <code>GET /api/v3/ticker</code></p>
+<ul>
+<li>Weight has been reduced from 5 to 2 per symbol, regardless of <code>windowSize</code>. </li>
+<li>The max number of symbols that can be processed in a request is 100.<ul>
+<li>If the number of <code>symbols</code> sent is more than 100, the error will be as follows:
+<code>json
+{
+ "code": -1101,
+ "msg": "Too many values sent for parameter 'symbols', maximum allowed up to 100." 
+}</code></li>
+</ul>
+</li>
+<li>The max Weight for this endpoint will cap at 100.<ul>
+<li>I.e. If the request has more than 50 symbols, the Weight will still be 100, regardless of <code>windowSize</code>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-06-15">2022-06-15</h2>
+<p><strong>Note:</strong> The update is being rolled out over the next few days, so these changes may not be visible right away.</p>
+<p>SPOT API</p>
+<ul>
+<li><code>GET /api/v3/ticker</code> added<ul>
+<li>Rolling window price change statistics based on <code>windowSize</code> provided.</li>
+<li>Contrary to <code>GET /api/v3/ticker/24hr</code> the list of symbols cannot be omitted.</li>
+<li>If <code>windowSize</code> not specified, the value will default to <code>1d</code>.</li>
+<li>Response is similar to <code>GET /api/v3/ticker/24hr</code>, minus the following fields: <code>prevClosePrice</code>, <code>lastQty</code>, <code>bidPrice</code>, <code>bidQty</code>, <code>askPrice</code>, <code>askQty</code></li>
+</ul>
+</li>
+<li><code>GET /api/v3/exchangeInfo</code> returns new field <code>cancelReplaceAllowed</code> in <code>symbols</code> list. </li>
+<li><code>POST /api/v3/order/cancelReplace</code> added<ul>
+<li>Cancels an existing order and places a new order on the same symbol.</li>
+<li>The filters are evaluated <strong>before</strong> the cancel order is placed.<ul>
+<li>e.g. If the <code>MAX_NUM_ORDERS</code> filter is 10, and the total number of open orders on the account is also 10, when using <code>POST /api/v3/order/cancelReplace</code> both the cancel order placement and new order will fail because of the filter.</li>
+</ul>
+</li>
+<li>The change is being rolled out in the next few days, thus this feature will be enabled once the upgrade is completed.</li>
+</ul>
+</li>
+<li>New filter <code>NOTIONAL</code> has been added.<ul>
+<li>Defines the allowed notional value (<code>price * quantity</code>) based on a configured <code>minNotional</code> and <code>maxNotional</code></li>
+</ul>
+</li>
+<li>New exchange filter <code>EXCHANGE_MAX_NUM_ICEBERG_ORDERS</code> has been added.<ul>
+<li>Defines the limit of open iceberg orders on an account</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-05-23">2022-05-23</h2>
+<ul>
+<li>Changes to Order Book Depth Levels<ul>
+<li>Quantities in the Depth levels were returning negative values in situations where they were exceeding the max value, resulting in an overflow.</li>
+<li>Going forward depth levels will not overflow, but will be capped at the max value based on the precision of the base asset. This means that the depth level is at max value <em>or more</em>.<ul>
+<li>E.g. If the precision is 8, then the max value for quantity will be at 92,233,720,368.54775807.</li>
+</ul>
+</li>
+<li>When the fix has been applied, a change in the order book at the affected price level is required for the changes to be visible.</li>
+</ul>
+</li>
+<li>
+<p>What does this affect?</p>
+<ul>
+<li>SPOT API<ul>
+<li><code>GET /api/v3/depth</code> </li>
+</ul>
+</li>
+<li>Websocket Streams<ul>
+<li><code>&lt;symbol&gt;@depth</code></li>
+<li><code>&lt;symbol&gt;@depth@100ms</code></li>
+<li><code>&lt;symbol&gt;@depth&lt;levels&gt;</code></li>
+<li><code>&lt;symbol&gt;@depth&lt;levels&gt;@100ms</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Updates to <code>MAX_POSITION</code></p>
+<ul>
+<li>If an order's <code>quantity</code> can cause the position to overflow, this will now fail the <code>MAX_POSITION</code> filter.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-05-17">2022-05-17</h2>
+<ul>
+<li>Changes to GET <code>api/v3/aggTrades</code><ul>
+<li>When providing <code>startTime</code> and <code>endTime</code>, the oldest items are returned.</li>
+</ul>
+</li>
+<li>Changed error messaging on <code>GET /api/v3/myTrades</code> where parameter <code>symbol</code> is not provided:</li>
+</ul>
+<pre><code class="language-json">{
+&quot;code&quot;: -1102,
+&quot;msg&quot;: &quot;Mandatory parameter 'symbol' was not sent, was empty/null, or malformed.&quot; 
+}
+</code></pre>
+<ul>
+<li>The following endpoints now support multi-symbol querying using the parameter <code>symbols</code>.<ul>
+<li><code>GET /api/v3/ticker/24hr</code></li>
+<li><code>GET /api/v3/ticker/price</code></li>
+<li><code>GET /api/v3/ticker/bookTicker</code></li>
+</ul>
+</li>
+<li>In the above, the request weight will depend on the number of symbols provided in <code>symbols</code>. <br/> Please refer to the table below:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Number of Symbols</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/v3/ticker/price</code></td>
+<td>Any</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>GET /api/v3/ticker/bookTicker</code></td>
+<td>Any</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>GET /api/v3/ticker/24hr</code></td>
+<td>1-20</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>GET /api/v3/ticker/24hr</code></td>
+<td>21-100</td>
+<td>20</td>
+</tr>
+<tr>
+<td><code>GET /api/v3/ticker/24hr</code></td>
+<td>101 or more</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2022-04-13">2022-04-13</h2>
+<p>REST API</p>
+<ul>
+<li>Trailing Stops have been enabled.<ul>
+<li>This is a type of algo order where the activation is based on a percentage of a price change in the market using the new parameter <code>trailingDelta</code>.</li>
+<li>This can only used with any of the following order types: <code>STOP_LOSS</code>, <code>STOP_LOSS_LIMIT</code>, <code>TAKE_PROFIT</code>, <code>TAKE_PROFIT_LIMIT</code>.</li>
+<li>The <code>trailingDelta</code> parameter will be done in Basis Points or BIPS.<ul>
+<li>For example: a STOP_LOSS SELL order with a <code>trailingDelta</code> of 100 will trigger after a price decrease of 1% from the highest price after the order is placed. (100 / 10,000 =&gt; 0.01 =&gt; 1%)</li>
+</ul>
+</li>
+<li>When used in combination with OCO Orders, the <code>trailingDelta</code> will determine when the contingent leg of the OCO will trigger.</li>
+<li>When <code>trailingDelta</code> is used in combination with <code>stopPrice</code>, once the <code>stopPrice</code> condition is met, the trailing stop starts tracking the price change from the <code>stopPrice</code> based on the <code>trailingDelta</code> provided.</li>
+<li>When no <code>stopPrice</code> is sent, the trailing stop starts tracking the price changes from the last price based on the <code>trailingDelta</code> provided.</li>
+</ul>
+</li>
+<li>Changes to POST <code>/api/v3/order</code><ul>
+<li>New optional field <code>trailingDelta</code></li>
+</ul>
+</li>
+<li>Changes to POST <code>/api/v3/order/test</code><ul>
+<li>New optional field <code>trailingDelta</code></li>
+</ul>
+</li>
+<li>Changes to POST <code>/api/v3/order/oco</code><ul>
+<li>New optional field <code>trailingDelta</code></li>
+</ul>
+</li>
+<li>A new filter <code>TRAILING_DELTA</code> has been added.<ul>
+<li>This filter is defined by the minimum and maximum values for the <code>trailingDelta</code> value.</li>
+</ul>
+</li>
+</ul>
+<p>USER DATA STREAM</p>
+<ul>
+<li>New field in <code>executionReport</code><ul>
+<li>"d" for <code>trailingDelta</code></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-04-12">2022-04-12</h2>
+<p><strong>Note:</strong> The changes are being rolled out during the next few days, so these will not appear right away.</p>
+<ul>
+<li>Error message changed on <code>GET api/v3/allOrders</code> where <code>symbol</code> is not provided:
+    <code>json
+    {
+     "code": -1102,
+     "msg": "Mandatory parameter 'symbol' was not sent, was empty/null, or malformed."
+    }</code></li>
+<li>Fixed a typo with an error message when an account has disabled permissions (e.g. to withdraw, to trade, etc)
+    <code>json
+    "This action is disabled on this account."</code></li>
+<li>During a market data audit, we detected some issues with the Spot aggregate trade data.<ul>
+<li>Missing aggregate trades were recovered.</li>
+<li>Duplicated records were marked invalid with the following values:<ul>
+<li>p = '0' // price</li>
+<li>q = '0' // qty</li>
+<li>f = -1 // ﬁrst_trade_id</li>
+<li>l = -1 // last_trade_id</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2022-02-28">2022-02-28</h2>
+<ul>
+<li>New field <code>allowTrailingStop</code> has been added to <code>GET /api/v3/exchangeInfo</code></li>
+</ul>
+<hr />
+<h2 id="2022-02-24">2022-02-24</h2>
+<ul>
+<li><code>(price-minPrice) % tickSize == 0</code> rule in <code>PRICE_FILTER</code> has been changed to <code>price % tickSize == 0</code>.</li>
+<li>A new filter <code>PERCENT_PRICE_BY_SIDE</code> has been added.</li>
+<li>Changes to GET <code>api/v3/depth</code><ul>
+<li>The <code>limit</code> value can be outside of the previous values (i.e. 5, 10, 20, 50, 100, 500, 1000,5000) and will return the correct limit. (i.e. if limit=3 then the response will be the top 3 bids and asks)</li>
+<li>The limit still cannot exceed 5000. If the limit provided is greater than 5000, then the response will be truncated to 5000.</li>
+<li>Due to the changes, these are the updated request weights based on the limit value provided:</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Limit</th>
+<th>Request Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1-100</td>
+<td>1</td>
+</tr>
+<tr>
+<td>101-500</td>
+<td>5</td>
+</tr>
+<tr>
+<td>501-1000</td>
+<td>10</td>
+</tr>
+<tr>
+<td>1001-5000</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Changes to GET <code>api/v3/aggTrades</code><ul>
+<li>When providing <code>startTime</code> and <code>endTime</code>, the oldest items are returned.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2021-12-29">2021-12-29</h2>
+<ul>
+<li>Removed out dated "Symbol Type" enum; added "Permissions" enum.</li>
+</ul>
+<h2 id="2021-11-01">2021-11-01</h2>
+<ul>
+<li><code>GET /api/v3/rateLimit/order</code> added<ul>
+<li>The endpoint will display the user's current order count usage for all intervals.</li>
+<li>This endpoint will have a request weight of 20.</li>
+</ul>
+</li>
+</ul>
+<h2 id="2021-09-14">2021-09-14</h2>
+<ul>
+<li>Add a <a href="https://github.com/binance/binance-api-swagger">YAML file</a> with OpenApi specification on the RESTful API.</li>
+</ul>
+<h2 id="2021-08-12">2021-08-12</h2>
+<ul>
+<li>GET <code>api/v3/myTrades</code> has a new optional field <code>orderId</code></li>
+</ul>
+<hr />
+<h2 id="2021-05-12">2021-05-12</h2>
+<ul>
+<li>Added <code>Data Source</code> in the documentation to explain where each endpoint is retrieving its data.</li>
+<li>Added field <code>Data Source</code> to each API endpoint in the documentation</li>
+<li>GET <code>api/v3/exchangeInfo</code> now supports single or multi-symbol query</li>
+</ul>
+<hr />
+<h2 id="2021-04-26">2021-04-26</h2>
+<p>On <strong>April 28, 2021 00:00 UTC</strong> the weights to the following endpoints will be adjusted:</p>
+<ul>
+<li><code>GET /api/v3/order</code> weight increased to 2</li>
+<li><code>GET /api/v3/openOrders</code> weight increased to 3</li>
+<li><code>GET /api/v3/allOrders</code> weight increased to 10</li>
+<li><code>GET /api/v3/orderList</code> weight increased to 2</li>
+<li><code>GET /api/v3/openOrderList</code> weight increased to 3</li>
+<li><code>GET /api/v3/account</code> weight increased to 10</li>
+<li><code>GET /api/v3/myTrades</code> weight increased to 10</li>
+<li><code>GET /api/v3/exchangeInfo</code> weight increased to 10</li>
+</ul>
+<hr />
+<h2 id="2021-01-01">2021-01-01</h2>
+<p><strong>USER DATA STREAM</strong></p>
+<ul>
+<li><code>outboundAccountInfo</code> has been removed.</li>
+</ul>
+<hr />
+<h2 id="2020-11-27">2020-11-27</h2>
+<p>New API clusters have been added in order to improve performance.</p>
+<p>Users can access any of the following API clusters, in addition to <code>api.binance.com</code></p>
+<p>If there are any performance issues with accessing <code>api.binance.com</code> please try any of the following instead:</p>
+<ul>
+<li>https://api1.binance.com/api/v3/*</li>
+<li>https://api2.binance.com/api/v3/*</li>
+<li>https://api3.binance.com/api/v3/*</li>
+</ul>
+<h2 id="2020-09-09">2020-09-09</h2>
+<p>USER DATA STREAM</p>
+<ul>
+<li><code>outboundAccountInfo</code> has been deprecated.</li>
+<li><code>outboundAccountInfo</code> will be removed in the future. (Exact date unknown) <strong>Please use <code>outboundAccountPosition</code> instead.</strong></li>
+<li><code>outboundAccountInfo</code> will now only show the balance of non-zero assets and assets that have been reduced to 0.</li>
+</ul>
+<hr />
+<h2 id="2020-05-01">2020-05-01</h2>
+<ul>
+<li>From 2020-05-01 UTC 00:00, all symbols will have a limit of 200 open orders using the <a href="../rest-api/#max_num_orders">MAX_NUM_ORDERS</a> filter.<ul>
+<li>No existing orders will be removed or canceled.</li>
+<li>Accounts that have 200 or more open orders on a symbol will not be able to place new orders on that symbol until the open order count is below 200.</li>
+<li>OCO orders count as 2 open orders before the <code>LIMIT</code> order is touched or the <code>STOP_LOSS</code> (or <code>STOP_LOSS_LIMIT</code>) order is triggered; once this happens the other order is canceled and will no longer count as an open order.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2020-04-25">2020-04-25</h2>
+<h3 id="rest-api">REST API</h3>
+<ul>
+<li>New field <code>permissions</code><ul>
+<li>Defines the trading permissions that are allowed on accounts and symbols.</li>
+<li><code>permissions</code> is an enum array; values:<ul>
+<li><code>SPOT</code></li>
+<li><code>MARGIN</code></li>
+</ul>
+</li>
+<li><code>permissions</code> will replace <code>isSpotTradingAllowed</code> and <code>isMarginTradingAllowed</code> on <code>GET api/v3/exchangeInfo</code> in future API versions (v4+).</li>
+<li>For an account to trade on a symbol, the account and symbol must share at least 1 permission in common.</li>
+</ul>
+</li>
+<li>Updates to <code>GET api/v3/exchangeInfo</code><ul>
+<li>New field <code>permissions</code> added.</li>
+<li>New field <code>quoteAssetPrecision</code> added; a duplicate of the <code>quotePrecision</code> field. <code>quotePrecision</code> will be removed in future API versions (v4+).</li>
+</ul>
+</li>
+<li>Updates to <code>GET api/v3/account</code><ul>
+<li>New field <code>permissions</code> added.</li>
+</ul>
+</li>
+<li>New endpoint <code>DELETE api/v3/openOrders</code><ul>
+<li>This will allow a user to cancel all open orders on a single symbol.</li>
+<li>This endpoint will cancel all open orders including OCO orders.</li>
+</ul>
+</li>
+<li>Orders can be canceled via the API on symbols in the <code>BREAK</code> or <code>HALT</code> status.</li>
+</ul>
+<h3 id="user-data">USER DATA</h3>
+<ul>
+<li><code>OutboundAccountInfo</code> has new field <code>P</code> which shows the trading permissions of the account.</li>
+</ul>
+<hr />
+<h2 id="2020-04-23">2020-04-23</h2>
+<p>WEB SOCKET STREAM</p>
+<ul>
+<li>WebSocket connections have a limit of 5 incoming messages per second. A message is considered:<ul>
+<li>A PING frame</li>
+<li>A PONG frame</li>
+<li>A JSON control message (e.g. subscribe, unsubscribe)</li>
+</ul>
+</li>
+<li>A connection that goes beyond the limit will be disconnected; IPs that are repeatedly disconnected may be banned.</li>
+<li>A single connection can listen to a maximum of 1024 streams.</li>
+</ul>
+<hr />
+<h2 id="2020-03-24">2020-03-24</h2>
+<ul>
+<li>
+<p><code>MAX_POSITION</code> filter added.</p>
+<ul>
+<li>
+<p>This filter defines the allowed maximum position an account can have on the base asset of a symbol. An account's position defined as the sum of the account's:</p>
+<ul>
+<li>free balance of the base asset</li>
+<li>locked balance of the base asset</li>
+<li>sum of the qty of all open BUY orders</li>
+</ul>
+</li>
+<li>
+<p><code>BUY</code> orders will be rejected if the account's position is greater than the maximum position allowed.</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2019-11-22">2019-11-22</h2>
+<ul>
+<li>Quote Order Qty Market orders have been enabled on all symbols.<ul>
+<li>Quote Order Qty <code>MARKET</code> orders allow a user to specify the total <code>quoteOrderQty</code> spent or received in the <code>MARKET</code> order.</li>
+<li>Quote Order Qty <code>MARKET</code> orders will not break <code>LOT_SIZE</code> filter rules; the order will execute a quantity that will have the notional value as close as possible to <code>quoteOrderQty</code>.</li>
+<li>Using <code>BNBBTC</code> as an example:<ul>
+<li>On the <code>BUY</code> side, the order will buy as many BNB as <code>quoteOrderQty</code> BTC can.</li>
+<li>On the <code>SELL</code> side, the order will sell as much BNB as needed to receive <code>quoteOrderQty</code> BTC.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2019-11-13">2019-11-13</h2>
+<h3 id="rest-api_1">Rest API</h3>
+<ul>
+<li>api/v3/exchangeInfo has new fields:<ul>
+<li><code>quoteOrderQtyMarketAllowed</code></li>
+<li><code>baseCommissionDecimalPlaces</code></li>
+<li><code>quoteCommissionDecimalPlaces</code></li>
+</ul>
+</li>
+<li><code>MARKET</code> orders have a new optional field: <code>quoteOrderQty</code> used to specify the quote quantity to BUY or SELL. This cannot be used in combination with <code>quantity</code>.<ul>
+<li>The exact timing that <code>quoteOrderQty</code> MARKET orders will be enabled is TBD. There will be a separate announcement and further details at that time.</li>
+</ul>
+</li>
+<li>All order query endpoints will return a new field <code>origQuoteOrderQty</code> in the JSON payload. (e.g. GET api/v3/allOrders)</li>
+<li>Updated error messages for  -1128<ul>
+<li>Sending an <code>OCO</code> with a <code>stopLimitPrice</code> but without a <code>stopLimitTimeInForce</code> will return the error:
+<code>json
+ {
+  "code": -1128,
+  "msg": "Combination of optional parameters invalid. Recommendation: 'stopLimitTimeInForce' should also be sent."
+ }</code></li>
+</ul>
+</li>
+<li>Updated error messages for -1003 to specify the limit is referring to the request weight, not to the number of requests.</li>
+</ul>
+<p><strong>Deprecation of v1 endpoints</strong>:</p>
+<p>By end of Q1 2020, the following endpoints will be removed from the API. The documentation has been updated to use the v3 versions of these endpoints.</p>
+<ul>
+<li>GET api/v1/depth</li>
+<li>GET api/v1/historicalTrades</li>
+<li>GET api/v1/aggTrades</li>
+<li>GET api/v1/klines</li>
+<li>GET api/v1/ticker/24hr</li>
+<li>GET api/v1/ticker/price</li>
+<li>GET api/v1/exchangeInfo</li>
+<li>POST api/v1/userDataStream</li>
+<li>PUT api/v1/userDataStream</li>
+<li>GET api/v1/ping</li>
+<li>GET api/v1/time</li>
+<li>GET api/v1/ticker/bookTicker</li>
+</ul>
+<p><strong>These endpoints however, will NOT be migrated to v3. Please use the following endpoints instead moving forward.</strong></p>
+<table>
+<tr>
+<th>Old V1 Endpoints</th>
+<th>New V3 Endpoints</th>
+</tr>
+<tr>
+<td>GET api/v1/ticker/allPrices</td>
+<td>GET api/v3/ticker/price</td>
+</tr>
+<tr>
+<td>GET api/v1/ticker/allBookTickers</td>
+<td>GET api/v3/ticker/bookTicker</td>
+</tr>
+</table>
+
+<h3 id="user-data-stream">USER DATA STREAM</h3>
+<ul>
+<li>
+<p>Changes to<code>executionReport</code> event</p>
+<ul>
+<li>If the C field is empty, it will now properly return <code>null</code>, instead of <code>"null"</code>.</li>
+<li>New field Q which represents the <code>quoteOrderQty</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>balanceUpdate</code> event type added</p>
+<ul>
+<li>This event occurs when funds are deposited or withdrawn from your account.</li>
+</ul>
+</li>
+</ul>
+<h3 id="web-socket-stream">WEB SOCKET STREAM</h3>
+<ul>
+<li>WSS now supports live subscribing/unsubscribing to streams.</li>
+</ul>
+<hr />
+<h2 id="2019-09-09">2019-09-09</h2>
+<ul>
+<li>New WebSocket streams for bookTickers added: <code>&lt;symbol&gt;@bookTicker</code> and <code>!bookTicker</code>. See <code>web-socket-streams.md</code> for details.</li>
+</ul>
+<hr />
+<h2 id="2019-09-03">2019-09-03</h2>
+<ul>
+<li>Faster order book data with 100ms updates: <code>&lt;symbol&gt;@depth@100ms</code> and <code>&lt;symbol&gt;@depth#@100ms</code></li>
+<li>Added "Update Speed:" to <code>web-socket-streams.md</code></li>
+<li>Removed deprecated v1 endpoints as per previous announcement:<ul>
+<li>GET api/v1/order</li>
+<li>GET api/v1/openOrders</li>
+<li>POST api/v1/order</li>
+<li>DELETE api/v1/order</li>
+<li>GET api/v1/allOrders</li>
+<li>GET api/v1/account</li>
+<li>GET api/v1/myTrades</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2019-08-16-update-2">2019-08-16 (Update 2)</h2>
+<ul>
+<li>GET api/v1/depth <code>limit</code> of 10000 has been temporarily removed</li>
+</ul>
+<hr />
+<h2 id="2019-08-16">2019-08-16</h2>
+<ul>
+<li>
+<p>In Q4 2017, the following endpoints were deprecated and removed from the API documentation. They have been permanently removed from the API as of this version. We apologize for the omission from the original changelog:</p>
+<ul>
+<li>GET api/v1/order</li>
+<li>GET api/v1/openOrders</li>
+<li>POST api/v1/order</li>
+<li>DELETE api/v1/order</li>
+<li>GET api/v1/allOrders</li>
+<li>GET api/v1/account</li>
+<li>GET api/v1/myTrades</li>
+</ul>
+</li>
+<li>
+<p>Streams, endpoints, parameters, payloads, etc. described in the documents in this repository are <strong>considered official</strong> and <strong>supported</strong>. The use of any other streams, endpoints, parameters, or payloads, etc. is <strong>not supported; use them at your own risk and with no guarantees.</strong></p>
+</li>
+</ul>
+<hr />
+<h2 id="2019-08-15">2019-08-15</h2>
+<h3 id="rest-api_2">Rest API</h3>
+<ul>
+<li>
+<p>New order type: OCO ("One Cancels the Other")</p>
+<ul>
+<li>
+<p>An OCO has 2 orders: (also known as legs in financial terms)</p>
+<ul>
+<li><code>STOP_LOSS</code> or <code>STOP_LOSS_LIMIT</code> leg</li>
+<li><code>LIMIT_MAKER</code> leg</li>
+</ul>
+</li>
+<li>
+<p>Price Restrictions:</p>
+<ul>
+<li><code>SELL Orders</code> : Limit Price &gt; Last Price &gt; Stop Price</li>
+<li><code>BUY Orders</code> : Limit Price &lt; Last Price &lt; Stop Price</li>
+<li>As stated, the prices must "straddle" the last traded price on the symbol. EX: If the last price is 10:<ul>
+<li>A SELL OCO must have the limit price greater than 10, and the stop price less than 10.</li>
+<li>A BUY OCO must have a limit price less than 10, and the stop price greater than 10.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Quantity Restrictions:</p>
+<ul>
+<li>Both legs must have the <strong>same quantity</strong>.</li>
+<li><code>ICEBERG</code> quantities however, do not have to be the same.</li>
+</ul>
+</li>
+<li>
+<p>Execution Order:</p>
+<ul>
+<li>If the <code>LIMIT_MAKER</code> is touched, the limit maker leg will be executed first BEFORE canceling the Stop Loss Leg.</li>
+<li>if the Market Price moves such that the <code>STOP_LOSS</code> or <code>STOP_LOSS_LIMIT</code> will trigger, the Limit Maker leg will be canceled BEFORE executing the <code>STOP_LOSS</code> Leg.</li>
+</ul>
+</li>
+<li>
+<p>Canceling an OCO</p>
+<ul>
+<li>Canceling either order leg will cancel the entire OCO.</li>
+<li>The entire OCO can be canceled via the <code>orderListId</code> or the <code>listClientOrderId</code>.</li>
+</ul>
+</li>
+<li>
+<p>New Enums for OCO:</p>
+<ol>
+<li><code>ListStatusType</code><ul>
+<li><code>RESPONSE</code> - used when ListStatus is responding to a failed action. (either order list placement or cancellation)</li>
+<li><code>EXEC_STARTED</code> - used when an order list has been placed or there is an update to a list's status.</li>
+<li><code>ALL_DONE</code> - used when an order list has finished executing and is no longer active.</li>
+</ul>
+</li>
+<li><code>ListOrderStatus</code><ul>
+<li><code>EXECUTING</code> - used when an order list has been placed or there is an update to a list's status.</li>
+<li><code>ALL_DONE</code> - used when an order list has finished executing and is no longer active.</li>
+<li><code>REJECT</code> - used when ListStatus is responding to a failed action. (either order list placement or cancellation)</li>
+</ul>
+</li>
+<li><code>ContingencyType</code><ul>
+<li><code>OCO</code> - specifies the type of order list.</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>New Endpoints:</p>
+<ul>
+<li>POST api/v3/order/oco</li>
+<li>DELETE api/v3/orderList</li>
+<li>GET api/v3/orderList</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>recvWindow</code> cannot exceed 60000.</p>
+</li>
+<li>New <code>intervalLetter</code> values for headers:<ul>
+<li>SECOND =&gt; S</li>
+<li>MINUTE =&gt; M</li>
+<li>HOUR =&gt; H</li>
+<li>DAY =&gt; D</li>
+</ul>
+</li>
+<li>New Headers <code>X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter)</code> will give your current used request weight for the (intervalNum)(intervalLetter) rate limiter. For example, if there is a one minute request rate weight limiter set, you will get a <code>X-MBX-USED-WEIGHT-1M</code> header in the response. The legacy header <code>X-MBX-USED-WEIGHT</code> will still be returned and will represent the current used weight for the one minute request rate weight limit.</li>
+<li>New Header <code>X-MBX-ORDER-COUNT-(intervalNum)(intervalLetter)</code>that is updated on any valid order placement and tracks your current order count for the interval; rejected/unsuccessful orders are not guaranteed to have <code>X-MBX-ORDER-COUNT-**</code> headers in the response.<ul>
+<li>Eg. <code>X-MBX-ORDER-COUNT-1S</code> for "orders per 1 second" and <code>X-MBX-ORDER-COUNT-1D</code> for orders per "one day"</li>
+</ul>
+</li>
+<li>GET api/v1/depth now supports <code>limit</code> 5000 and 10000; weights are 50 and 100 respectively.</li>
+<li>GET api/v1/exchangeInfo has a new parameter <code>ocoAllowed</code>.</li>
+</ul>
+<h3 id="user-data-stream_1">USER DATA STREAM</h3>
+<ul>
+<li><code>executionReport</code> event now contains "g" which has the <code>orderListId</code>; it will be set to -1 for non-OCO orders.</li>
+<li>New Event Type <code>listStatus</code>; <code>listStatus</code> is sent on an update to any OCO order.</li>
+<li>New Event Type <code>outboundAccountPosition</code>; <code>outboundAccountPosition</code> is sent any time an account's balance changes and contains the assets that could have changed by the event that generated the balance change (a deposit, withdrawal, trade, order placement, or cancellation).</li>
+</ul>
+<h3 id="new-errors">NEW ERRORS</h3>
+<ul>
+<li><strong>-1131 BAD_RECV_WINDOW</strong><ul>
+<li><code>recvWindow</code> must be less than 60000</li>
+</ul>
+</li>
+<li><strong>-1099 Not found, authenticated, or authorized</strong><ul>
+<li>This replaces error code -1999</li>
+</ul>
+</li>
+</ul>
+<h3 id="new-2011-errors">NEW -2011 ERRORS</h3>
+<ul>
+<li><strong>OCO_BAD_ORDER_PARAMS</strong><ul>
+<li>A parameter for one of the orders is incorrect.</li>
+</ul>
+</li>
+<li><strong>OCO_BAD_PRICES</strong><ul>
+<li>The relationship of the prices for the orders is not correct.</li>
+</ul>
+</li>
+<li><strong>UNSUPPORTED_ORD_OCO</strong><ul>
+<li>OCO orders are not supported for this symbol.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2019-03-12">2019-03-12</h2>
+<h3 id="rest-api_3">Rest API</h3>
+<ul>
+<li>X-MBX-USED-WEIGHT header added to Rest API responses.</li>
+<li>Retry-After header added to Rest API 418 and 429 responses.</li>
+<li>When canceling the Rest API can now return <code>errorCode</code> -1013 OR -2011 if the symbol's <code>status</code> isn't <code>TRADING</code>.</li>
+<li><code>api/v1/depth</code> no longer has the ignored and empty <code>[]</code>.</li>
+<li><code>api/v3/myTrades</code> now returns <code>quoteQty</code>; the price * qty of for the trade.</li>
+</ul>
+<h3 id="websocket-streams">Websocket streams</h3>
+<ul>
+<li><code>&lt;symbol&gt;@depth</code> and <code>&lt;symbol&gt;@depthX</code> streams no longer have the ignored and empty <code>[]</code>.</li>
+</ul>
+<h3 id="system-improvements">System improvements</h3>
+<ul>
+<li>Matching Engine stability/reliability improvements.</li>
+<li>Rest API performance improvements.</li>
+</ul>
+<hr />
+<h2 id="2018-11-13">2018-11-13</h2>
+<h3 id="rest-api_4">Rest API</h3>
+<ul>
+<li>Can now cancel orders through the Rest API during a trading ban.</li>
+<li>New filters: <code>PERCENT_PRICE</code>, <code>MARKET_LOT_SIZE</code>, <code>MAX_NUM_ICEBERG_ORDERS</code>.</li>
+<li>Added <code>RAW_REQUESTS</code> rate limit. Limits based on the number of requests over X minutes regardless of weight.</li>
+<li>/api/v3/ticker/price increased to weight of 2 for a no symbol query.</li>
+<li>/api/v3/ticker/bookTicker increased weight of 2 for a no symbol query.</li>
+<li>DELETE /api/v3/order will now return an execution report of the final state of the order.</li>
+<li><code>MIN_NOTIONAL</code> filter has two new parameters: <code>applyToMarket</code> (whether or not the filter is applied to MARKET orders) and <code>avgPriceMins</code> (the number of minutes over which the price averaged for the notional estimation).</li>
+<li><code>intervalNum</code> added to /api/v1/exchangeInfo limits. <code>intervalNum</code> describes the amount of the interval. For example: <code>intervalNum</code> 5, with <code>interval</code> minute, means "every 5 minutes".</li>
+</ul>
+<h4 id="explanation-for-the-average-price-calculation">Explanation for the average price calculation:</h4>
+<ol>
+<li>
+<p>(qty * price) of all trades / sum of qty of all trades over previous 5 minutes.</p>
+</li>
+<li>
+<p>If there is no trade in the last 5 minutes, it takes the first trade that happened outside of the 5min window.
+   For example if the last trade was 20 minutes ago, that trade's price is the 5 min average.</p>
+</li>
+<li>
+<p>If there is no trade on the symbol, there is no average price and market orders cannot be placed.
+   On a new symbol with <code>applyToMarket</code> enabled on the <code>MIN_NOTIONAL</code> filter, market orders cannot be placed until there is at least 1 trade.</p>
+</li>
+<li>
+<p>The current average price can be checked here: <code>https://api.binance.com/api/v3/avgPrice?symbol=&lt;symbol&gt;</code>
+   For example:
+   https://api.binance.com/api/v3/avgPrice?symbol=BNBUSDT</p>
+</li>
+</ol>
+<h3 id="user-data-stream_2">User data stream</h3>
+<ul>
+<li><code>Last quote asset transacted quantity</code> (as variable <code>Y</code>) added to execution reports. Represents the <code>lastPrice</code> * <code>lastQty</code> (<code>L</code> * <code>l</code>).</li>
+</ul>
+<hr />
+<h2 id="2018-07-18">2018-07-18</h2>
+<h3 id="rest-api_5">Rest API</h3>
+<ul>
+<li>New filter: <code>ICEBERG_PARTS</code></li>
+<li><code>POST api/v3/order</code> new defaults for <code>newOrderRespType</code>. <code>ACK</code>, <code>RESULT</code>, or <code>FULL</code>; <code>MARKET</code> and <code>LIMIT</code> order types default to <code>FULL</code>, all other orders default to <code>ACK</code>.</li>
+<li>POST api/v3/order <code>RESULT</code> and <code>FULL</code> responses now have <code>cummulativeQuoteQty</code></li>
+<li>GET api/v3/openOrders with no symbol weight reduced to 40.</li>
+<li>GET api/v3/ticker/24hr with no symbol weight reduced to 40.</li>
+<li>Max amount of trades from GET /api/v1/trades increased to 1000.</li>
+<li>Max amount of trades from GET /api/v1/historicalTrades increased to 1000.</li>
+<li>Max amount of aggregate trades from GET /api/v1/aggTrades increased to 1000.</li>
+<li>Max amount of aggregate trades from GET /api/v1/klines increased to 1000.</li>
+<li>Rest API Order lookups now return <code>updateTime</code> which represents the last time the order was updated; <code>time</code> is the order creation time.</li>
+<li>Order lookup endpoints will now return <code>cummulativeQuoteQty</code>. If <code>cummulativeQuoteQty</code> is &lt; 0, it means the data isn't available for this order at this time.</li>
+<li><code>REQUESTS</code> rate limit type changed to <code>REQUEST_WEIGHT</code>. This limit was always logically request weight and the previous name for it caused confusion.</li>
+</ul>
+<h3 id="user-data-stream_3">User data stream</h3>
+<ul>
+<li><code>cummulativeQuoteQty</code> field added to order responses and execution reports (as variable <code>Z</code>). Represents the cummulative amount of the <code>quote</code> that has been spent (with a <code>BUY</code> order) or received (with a <code>SELL</code> order). Historical orders will have a value &lt; 0 in this field indicating the data is not available at this time. <code>cummulativeQuoteQty</code> divided by <code>cummulativeQty</code> will give the average price for an order.</li>
+<li><code>O</code> (order creation time) added to execution reports</li>
+</ul>
+<hr />
+<h2 id="2018-01-23">2018-01-23</h2>
+<ul>
+<li>GET /api/v1/historicalTrades weight decreased to 5</li>
+<li>GET /api/v1/aggTrades weight decreased to 1</li>
+<li>GET /api/v1/klines weight decreased to 1</li>
+<li>GET /api/v1/ticker/24hr all symbols weight decreased to number of trading symbols / 2</li>
+<li>GET /api/v3/allOrders weight decreased to 5</li>
+<li>GET /api/v3/myTrades weight decreased to 5</li>
+<li>GET /api/v3/account weight decreased to 5</li>
+<li>GET /api/v1/depth limit=500 weight decreased to 5</li>
+<li>GET /api/v1/depth limit=1000 weight decreased to 10</li>
+<li>-1003 error message updated to direct users to websockets</li>
+</ul>
+<hr />
+<h2 id="2018-01-20">2018-01-20</h2>
+<ul>
+<li>GET /api/v1/ticker/24hr single symbol weight decreased to 1</li>
+<li>GET /api/v3/openOrders all symbols weight decreased to number of trading symbols / 2</li>
+<li>GET /api/v3/allOrders weight decreased to 15</li>
+<li>GET /api/v3/myTrades weight decreased to 15</li>
+<li>GET /api/v3/order weight decreased to 1</li>
+<li>myTrades will now return both sides of a self-trade/wash-trade</li>
+</ul>
+<hr />
+<h2 id="2018-01-14">2018-01-14</h2>
+<ul>
+<li>GET /api/v1/aggTrades weight changed to 2</li>
+<li>GET /api/v1/klines weight changed to 2</li>
+<li>GET /api/v3/order weight changed to 2</li>
+<li>GET /api/v3/allOrders weight changed to 20</li>
+<li>GET /api/v3/account weight changed to 20</li>
+<li>GET /api/v3/myTrades weight changed to 20</li>
+<li>GET /api/v3/historicalTrades weight changed to 20</li>
+</ul>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
